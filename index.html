@@ -303,12 +303,7 @@
                         let moved = false;
                         function moveNeverBtn() {
                             if (!moved) {
-                                // On first interaction, make it absolutely positioned at its current spot
-                                const rect = neverBtn.getBoundingClientRect();
                                 neverBtn.style.position = 'fixed';
-                                neverBtn.style.left = rect.left + 'px';
-                                neverBtn.style.top = rect.top + 'px';
-                                neverBtn.style.transform = 'none';
                                 neverBtn.style.zIndex = '1003';
                                 moved = true;
                             }
@@ -316,18 +311,27 @@
                             const windowHeight = window.innerHeight;
                             const btnWidth = neverBtn.offsetWidth;
                             const btnHeight = neverBtn.offsetHeight;
-
-                            // Calculate random position ensuring button stays fully visible
-                            const margin = 20;
-                            const maxX = windowWidth - btnWidth - margin;
-                            const maxY = windowHeight - btnHeight - margin;
-                            
-                            const randomX = margin + Math.floor(Math.random() * Math.max(10, maxX - margin));
-                            const randomY = margin + Math.floor(Math.random() * Math.max(10, maxY - margin));
-                            
+                            const margin = 10;
+                            let randomX = Math.floor(Math.random() * (windowWidth - btnWidth - 2 * margin)) + margin;
+                            let randomY = Math.floor(Math.random() * (windowHeight - btnHeight - 2 * margin)) + margin;
+                            // Clamp to ensure fully visible
+                            randomX = Math.max(margin, Math.min(randomX, windowWidth - btnWidth - margin));
+                            randomY = Math.max(margin, Math.min(randomY, windowHeight - btnHeight - margin));
                             neverBtn.style.transition = 'all 0.35s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
                             neverBtn.style.left = randomX + 'px';
                             neverBtn.style.top = randomY + 'px';
+                            // Final correction after move
+                            setTimeout(() => {
+                                const rect = neverBtn.getBoundingClientRect();
+                                let left = parseInt(neverBtn.style.left, 10);
+                                let top = parseInt(neverBtn.style.top, 10);
+                                if (rect.left < margin) left = margin;
+                                if (rect.top < margin) top = margin;
+                                if (rect.right > windowWidth - margin) left = windowWidth - btnWidth - margin;
+                                if (rect.bottom > windowHeight - margin) top = windowHeight - btnHeight - margin;
+                                neverBtn.style.left = left + 'px';
+                                neverBtn.style.top = top + 'px';
+                            }, 400);
                         }
                         neverBtn.addEventListener('mouseenter', moveNeverBtn);
                         neverBtn.addEventListener('mouseover', moveNeverBtn);
@@ -345,15 +349,139 @@
                         if (yesOfCourseBtn) {
                             yesOfCourseBtn.addEventListener('click', function() {
                                 followUp.style.opacity = '0';
-                                followUp.style.transition = 'opacity 0.5s ease';
+                                followUp.style.transition = 'opacity 0.7s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
                                 setTimeout(() => {
-                                    followUp.innerHTML = '<div style="font-size: 2.5rem; text-align: center; line-height: 1.4;">Thankyouu baby 😉<br>I love youuuuu ❤️</div>';
-                                    if (window.innerWidth <= 480) {
-                                        const textDiv = followUp.querySelector('div');
-                                        if (textDiv) textDiv.style.fontSize = '1.8rem';
+                                    // Add glowing, animated, and confetti effect
+                                    followUp.innerHTML = `
+                                        <div class="special-love-msg">
+                                            Thankyouu baby <span class="wink">😉</span><br>
+                                            <span class="glow">I love youuuuu ❤️</span><br>
+                                            <span class="kiss-emoji">😘</span>
+                                        </div>
+                                        <div id="specialHearts"></div>
+                                        <div id="specialConfetti"></div>
+                                    `;
+                                    // Add mero mutuu style
+                                    if (!document.getElementById('meroMutuuStyle')) {
+                                        const mutuuStyle = document.createElement('style');
+                                        mutuuStyle.id = 'meroMutuuStyle';
+                                        mutuuStyle.innerHTML = `
+                                            .mero-mutuu {
+                                                position: fixed;
+                                                left: 18px;
+                                                bottom: 18px;
+                                                font-size: 1.3rem;
+                                                color: #fff;
+                                                font-family: 'Pacifico', cursive;
+                                                text-shadow: 0 0 8px #ff6b9d, 0 0 12px #ff4081;
+                                                z-index: 2000;
+                                                animation: popIn 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                                            }
+                                            @media (max-width: 600px) {
+                                                .mero-mutuu {
+                                                    font-size: 1rem;
+                                                    left: 8px;
+                                                    bottom: 8px;
+                                                }
+                                            }
+                                        `;
+                                        document.head.appendChild(mutuuStyle);
+                                    }
+                                                                        // Add kiss animation style
+                                                                        if (!document.getElementById('specialKissStyle')) {
+                                                                            const kissStyle = document.createElement('style');
+                                                                            kissStyle.id = 'specialKissStyle';
+                                                                            kissStyle.innerHTML = `
+                                                                                .kiss-emoji {
+                                                                                    display: inline-block;
+                                                                                    font-size: 2.5rem;
+                                                                                    animation: kissPop 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite alternate;
+                                                                                    filter: drop-shadow(0 0 10px #ff6b9d);
+                                                                                    margin-top: 0.5rem;
+                                                                                }
+                                                                                @keyframes kissPop {
+                                                                                    0% { transform: scale(1) rotate(-10deg); opacity: 0.7; }
+                                                                                    60% { transform: scale(1.25) rotate(10deg); opacity: 1; }
+                                                                                    100% { transform: scale(1) rotate(-10deg); opacity: 0.7; }
+                                                                                }
+                                                                            `;
+                                                                            document.head.appendChild(kissStyle);
+                                                                        }
+                                    // Responsive font size
+                                    const textDiv = followUp.querySelector('.special-love-msg');
+                                    if (window.innerWidth <= 480 && textDiv) {
+                                        textDiv.style.fontSize = '2rem';
                                     }
                                     followUp.style.opacity = '1';
-                                }, 500);
+
+                                    // Add glowing text style and animation
+                                    if (!document.getElementById('specialLoveStyle')) {
+                                        const style = document.createElement('style');
+                                        style.id = 'specialLoveStyle';
+                                        style.innerHTML = `
+                                            .special-love-msg {
+                                                font-size: 2.5rem;
+                                                text-align: center;
+                                                line-height: 1.4;
+                                                margin-top: 1.5rem;
+                                                margin-bottom: 1.5rem;
+                                                color: #fff;
+                                                text-shadow: 0 0 10px #ff6b9d, 0 0 20px #ff4081;
+                                                animation: popIn 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                                            }
+                                            .special-love-msg .glow {
+                                                color: #fff;
+                                                text-shadow: 0 0 20px #ff4081, 0 0 40px #ff6b9d, 0 0 60px #fff;
+                                                animation: glowPulse 1.5s infinite alternate;
+                                            }
+                                            .special-love-msg .wink {
+                                                display: inline-block;
+                                                animation: winkAnim 1.2s infinite;
+                                            }
+                                            @keyframes popIn {
+                                                0% { transform: scale(0.7); opacity: 0; }
+                                                80% { transform: scale(1.1); opacity: 1; }
+                                                100% { transform: scale(1); opacity: 1; }
+                                            }
+                                            @keyframes glowPulse {
+                                                0% { text-shadow: 0 0 10px #ff4081, 0 0 20px #ff6b9d; }
+                                                100% { text-shadow: 0 0 30px #fff, 0 0 60px #ff4081; }
+                                            }
+                                            @keyframes winkAnim {
+                                                0%, 90%, 100% { transform: rotate(0deg); }
+                                                40% { transform: rotate(-20deg) scale(1.2); }
+                                            }
+                                        `;
+                                        document.head.appendChild(style);
+                                    }
+
+                                    // Add floating hearts
+                                    const specialHearts = document.getElementById('specialHearts');
+                                    for (let i = 0; i < 18; i++) {
+                                        const heart = document.createElement('div');
+                                        heart.className = 'heart';
+                                        heart.innerHTML = '❤️';
+                                        heart.style.left = Math.random() * 100 + '%';
+                                        heart.style.fontSize = (Math.random() * 1.5 + 1.2) + 'rem';
+                                        heart.style.animationDelay = (Math.random() * 1.5) + 's';
+                                        heart.style.animationDuration = (Math.random() * 2 + 3) + 's';
+                                        specialHearts.appendChild(heart);
+                                        setTimeout(() => heart.remove(), 6000);
+                                    }
+                                    // Add confetti
+                                    const specialConfetti = document.getElementById('specialConfetti');
+                                    const confettiColors = ['#ff6b9d', '#ffd700', '#00ffff', '#ff69b4', '#9370db', '#00ff00'];
+                                    for (let i = 0; i < 30; i++) {
+                                        const conf = document.createElement('div');
+                                        conf.className = 'confetti';
+                                        conf.style.backgroundColor = confettiColors[Math.floor(Math.random() * confettiColors.length)];
+                                        conf.style.left = Math.random() * 100 + '%';
+                                        conf.style.animationDelay = Math.random() + 's';
+                                        conf.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                                        specialConfetti.appendChild(conf);
+                                        setTimeout(() => conf.remove(), 5000);
+                                    }
+                                }, 700);
                             });
                         }
                     }
