@@ -103,8 +103,8 @@
             const btnHeight = noBtn.offsetHeight;
 
             // Calculate random position ensuring button stays visible
-            const maxX = windowWidth - btnWidth - 20;
-            const maxY = windowHeight - btnHeight - 20;
+            const maxX = Math.max(0, windowWidth - btnWidth - 20);
+            const maxY = Math.max(0, windowHeight - btnHeight - 20);
             const randomX = Math.floor(Math.random() * maxX);
             const randomY = Math.floor(Math.random() * maxY);
 
@@ -120,9 +120,6 @@
             e.preventDefault();
             moveNoButton();
         });
-
-        // Initialize No button position
-        moveNoButton();
     </script>
 </body>
 </html>
